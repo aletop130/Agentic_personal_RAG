@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: agentic-rag-qdrant
+    ports:
+      - "7333:6333"  # Changed to avoid conflicts with existing Qdrant
+      - "7334:6334"
+    volumes:
+      - agentic_rag_storage:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+
+volumes:
+  agentic_rag_storage:  # Unique volume name

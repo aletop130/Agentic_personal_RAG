@@ -1,0 +1,33 @@
+# Python 3.12+ required for Regolo AI
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+
+# Qdrant
+qdrant-client
+
+# Regolo AI (OpenAI compatible)
+openai
+regolo
+
+# Document Processing
+pypdf
+python-docx
+pdfplumber
+unstructured
+
+# LangChain
+langchain
+langchain-text-splitters
+langchain-community
+langchain-openai
+
+# LangGraph
+langgraph
+
+# Utilities
+python-dotenv
+httpx
+aiofiles

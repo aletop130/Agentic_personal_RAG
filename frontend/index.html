@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic RAG - Document Q&A</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl">
+                        <i data-lucide="bot" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Agentic RAG
+                        </h1>
+                        <p class="text-gray-400 text-sm">Document Intelligence Powered by Regolo AI</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2" id="connection-status">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                    <span class="text-sm text-gray-400">Checking...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="mb-6">
+            <div class="flex gap-2 bg-gray-800 p-1 rounded-lg">
+                <button onclick="switchTab('upload')" id="tab-upload" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-md transition-all">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                    Upload
+                </button>
+                <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-md transition-all">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                    Chat
+                </button>
+                <button onclick="switchTab('documents')" id="tab-documents" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-md transition-all">
+                    <i data-lucide="files" class="w-4 h-4"></i>
+                    Documents
+                </button>
+            </div>
+        </nav>
+
+        <!-- Upload Section -->
+        <section id="section-upload" class="tab-content">
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="upload" class="w-5 h-5 text-blue-400"></i>
+                    Upload Documents
+                </h2>
+                
+                <div id="drop-zone" class="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                    <i data-lucide="file-plus" class="w-16 h-16 mx-auto mb-4 text-gray-500"></i>
+                    <p class="text-lg mb-2">Drag & drop your files here</p>
+                    <p class="text-gray-400 text-sm mb-4">or click to browse</p>
+                    <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.txt" multiple>
+                    <button onclick="document.getElementById('file-input').click()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition-colors">
+                        Select Files
+                    </button>
+                    <p class="text-gray-500 text-xs mt-4">Supported formats: PDF, DOCX, TXT (Max 10MB)</p>
+                </div>
+
+                <div id="upload-progress" class="mt-4 hidden">
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="loader-2" class="w-5 h-5 animate-spin text-blue-400"></i>
+                            <span id="upload-status">Uploading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section id="section-chat" class="tab-content hidden">
+            <div class="bg-gray-800 rounded-2xl overflow-hidden">
+                <div class="p-4 border-b border-gray-700">
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        <i data-lucide="message-circle" class="w-5 h-5 text-purple-400"></i>
+                        Chat with Your Documents
+                    </h2>
+                </div>
+                
+                <!-- Messages Container -->
+                <div id="messages" class="h-96 overflow-y-auto p-4 space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <i data-lucide="sparkles" class="w-12 h-12 mx-auto mb-3 text-gray-600"></i>
+                        <p>Ask questions about your uploaded documents</p>
+                    </div>
+                </div>
+
+                <!-- Input Section -->
+                <div class="p-4 border-t border-gray-700">
+                    <form id="chat-form" class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            placeholder="Type your question..." 
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documents Section -->
+        <section id="section-documents" class="tab-content hidden">
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        <i data-lucide="folder-open" class="w-5 h-5 text-green-400"></i>
+                        Uploaded Documents
+                    </h2>
+                    <button onclick="deleteAllDocuments()" class="text-red-400 hover:text-red-300 text-sm flex items-center gap-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        Delete All
+                    </button>
+                </div>
+                
+                <div id="documents-list" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8">
+                        <i data-lucide="files" class="w-12 h-12 mx-auto mb-3 text-gray-600"></i>
+                        <p>No documents uploaded yet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        <div class="flex items-center gap-3">
+            <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+            <span id="toast-message" class="text-sm"></span>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
