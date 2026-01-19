@@ -102,13 +102,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### 6. Apri Frontend
 
-Apri `frontend/index.html` nel browser o servilo:
-```bash
-cd frontend
-python -m http.server 8000
-```
-
-Visita `http://localhost:8000`
+Visita : http://localhost:8000/static/index.html
 
 ## Come Funziona
 

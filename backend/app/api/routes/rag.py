@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import StreamingResponse
-from typing import List
 import json
 import logging
-
 from app.services.rag_service import rag_service
 from app.models.schemas import ChatRequest, ChatResponse
 from app.core.regolo_service import regolo_service
