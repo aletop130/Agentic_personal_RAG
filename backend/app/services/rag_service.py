@@ -73,18 +73,18 @@ class RAGService:
             
             # Extract sources from tool messages
             for msg in messages:
-                if hasattr(msg, 'content') and "[Source" in str(msg.content):
-                    # Parse sources from tool response
+                if hasattr(msg, 'content') and "<metadata_source_" in str(msg.content):
                     content = str(msg.content)
                     import re
-                    source_pattern = r'\[Source \d+: ([^,]+), Page (\d+)\]'
+                    source_pattern = r'<metadata_source_(\d+)>\nfilename:([^\n]+)\npage:([^\n]+)\nscore:([\d.]+)'
                     matches = re.findall(source_pattern, content)
-                    
-                    for filename, page in matches:
-                        if not any(s["filename"] == filename and s["page"] == page for s in sources):
+
+                    for source_id, filename, page, score in matches:
+                        if not any(s["filename"] == filename.strip() and s["page"] == page.strip() for s in sources):
                             sources.append({
-                                "filename": filename,
-                                "page": page
+                                "filename": filename.strip(),
+                                "page": page.strip(),
+                                "score": float(score)
                             })
             
             return {

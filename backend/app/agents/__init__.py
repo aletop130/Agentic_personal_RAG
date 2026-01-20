@@ -67,9 +67,13 @@ def search_documents(query: str, top_k: int = 5) -> str:
             page = metadata.get("page_number", "N/A")
             score = result.get("score", 0.0)
             
-            # Include source info in the string so the LLM can cite it
+            # Include source info in metadata format for extraction, but hide from LLM
             context_parts.append(
-                f"[Source {i}: {filename}, Page {page} (Score: {score:.2f})]\n"
+                f"<metadata_source_{i}>\n"
+                f"filename:{filename}\n"
+                f"page:{page}\n"
+                f"score:{score:.2f}\n"
+                f"</metadata_source_{i}>\n"
                 f"{result['text']}"
             )
         
@@ -102,12 +106,13 @@ def create_rag_agent():
     
     # System prompt
     system_prompt = """Sei un assistente AI utile che risponde alle domande basandoti sui documenti caricati.
-    
+
 REGOLE:
 - Usa il tool search_documents quando l'utente chiede informazioni che potrebbero essere nei documenti
 - Rispondi in italiano
 - Se il contesto non contiene informazioni sufficienti, dillo chiaramente
-- Cita le fonti quando possibile (documento e pagina)
+- NON menzionare le fonti nel testo della risposta
+- Le fonti verranno visualizzate separatamente dall'interfaccia
 - Sii conciso e preciso"""
     
     # Define nodes
